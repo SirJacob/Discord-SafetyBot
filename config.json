@@ -1,0 +1,56 @@
+{
+  "DiscordJS_botToken": "",
+  "DiscordJS_chatPrefix": "!",
+  "ConfigMemory_mysqlLoad_allow": true,
+  "ConfigMemory_mysqlSave_allow": true,
+  "ConfigMemory_mysqlLoadDefault_allow": false,
+  "ConfigMemory_mysqlSaveDefault_allow": false,
+  "ConfigMemory_default": {
+    "cmd_fakeKick": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": true
+    },
+    "cmd_everyone": {
+      "enabled": false,
+      "rename": "",
+      "requireAdmin": true
+    },
+    "cmd_giveAll": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": true
+    },
+    "cmd_takeAll": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": true
+    },
+    "cmd_delete": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": true,
+      "searchLimit": 50,
+      "deleteLimit": 50
+    },
+    "cmd_myID": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": false
+    },
+    "cmd_avatar": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": false
+    },
+    "cmd_config": {
+      "enabled": true,
+      "rename": "",
+      "requireAdmin": true
+    },
+    "feature_ImageURLRemover": {
+      "enabled": false,
+      "requireAdmin": true
+    }
+  }
+}

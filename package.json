@@ -1,0 +1,11 @@
+{
+  "name": "PoliceBot",
+  "version": "0.0.1",
+  "dependencies": {
+    "discord.js": "latest",
+    "mysql2": "latest",
+    "npm": "^6.3.0",
+    "raven": "^2.6.3",
+    "underscore": "^1.9.1"
+  }
+}
