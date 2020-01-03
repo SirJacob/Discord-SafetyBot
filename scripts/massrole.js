@@ -1,10 +1,10 @@
 const h = require("../helper.js");
 
-module.exports.giveall = function cmdGiveAll(message, args) {
+module.exports.giveall = function (message, args) {
     return cmdMassRole(message, args, true);
 };
 
-module.exports.takeall = function cmdTakeAll(message, args) {
+module.exports.takeall = function (message, args) {
     return cmdMassRole(message, args, false);
 };
 

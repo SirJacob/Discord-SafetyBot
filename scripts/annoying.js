@@ -1,7 +1,7 @@
 const h = require("../helper.js");
 
 // TODO: Allow users to append a message
-module.exports.everyone = function cmdEveryone(message, args) {
+module.exports.everyone = function (message, args) {
     if (args > 0) return;
 
     let atEveryone = "";

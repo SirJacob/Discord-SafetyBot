@@ -3,10 +3,15 @@
 const Discord = require("discord.js");
 const Config = require("./config.json");
 const h = require("./helper.js");
+const fs = require("fs");
+const path = require("path");
 const Client = new Discord.Client({
     "apiRequestMethod": "burst" // sequential or burst
 });
+/* Exports that scripts can use */
 module.exports.Client = Client;
+module.exports.terminate = terminate;
+
 /* Removed disabledEvents from ClientOptions and stopped removing all disabledEvents listeners because of role giving/
 * taking was leading to timeouts. May reimplement/reinvestigate if memory issues are found again. */
 Client.on('newListener', (event, listener) => {
@@ -15,6 +20,8 @@ Client.on('newListener', (event, listener) => {
 Client.on('rateLimit', rateLimitInfo => {
     h.log("==> RATE LIMITED <==");
 });
+
+let botReady = false;
 
 //This event will run if the bot starts, and logs in, successfully.
 Client.on("ready", async () => {
@@ -25,19 +32,38 @@ Client.on("ready", async () => {
         h.log(`Preexisting server detected: ${h.verboseGuildTag(guild)} | Users: ${guild.memberCount - 1} | Channels: ${guild.channels.size}`);
     }
 
-    require("fs").readdirSync(require("path").join(__dirname, "scripts")).forEach(function (file) {
+    // Create a scripts folder
+    let scriptsFolder = path.join(__dirname, "scripts");
+    if (!fs.existsSync(scriptsFolder)) {
+        h.log(`Creating a scripts folder`);
+        fs.mkdirSync(scriptsFolder);
+    }
+
+    let loadedScripts = 0;
+    let loadedCmds = 0;
+    // TODO: More robust script loading
+    fs.readdirSync(scriptsFolder).forEach(function (file) {
         h.log(`Loading script: '${file}'`);
         let script = require("./scripts/" + file);
         for (let cmd in script) {
-            if (!existsInRunnable(cmd)) {
+            if (cmd === "initialize") {
+                h.log(`Initializing '${file}'`);
+                script[cmd]();
+            } else if (cmd === "terminate") {
+                terminationScripts.push(script[cmd]);
+            } else if (!existsInRunnable(cmd)) {
+                h.log(`Loading command '${cmd}' from '${file}'`);
                 runnable[cmd] = script[cmd];
-                h.log(`Loaded command '${cmd}' from script '${file}'`);
+                loadedCmds += 1;
             } else {
-                h.log(`Failed loading command '${cmd}' from script '${file}' (command already exists)`);
+                h.log(`Failed loading command '${cmd}' from '${file}' (command already exists)`);
             }
         }
-        h.log(`Finished loading script: '${file}'`);
+        h.log(`Loaded script: '${file}'`);
+        loadedScripts += 1;
     });
+    h.log(`Finished loading ${loadedCmds} cmds from ${loadedScripts} scripts`);
+    botReady = true;
 });
 
 //This event triggers when the bot joins a server.
@@ -56,6 +82,7 @@ Client.on("messageDelete", async message => {
 
 // This event will run on every single message received, from any channel or DM.
 Client.on("message", async message => {
+    if (!botReady) return;
     if (isBadMessage(message)) return;
     if (message.system) {
         onSystemMessage(message);
@@ -79,7 +106,7 @@ function onBotMessage(message) {
 function onSystemMessage(message) {
 }
 
-const runnable = {};
+let runnable = {};
 
 function existsInRunnable(funcName) {
     return runnable[funcName] != null;
@@ -87,8 +114,21 @@ function existsInRunnable(funcName) {
 
 //rename (check), enabled (check), requireAdmin (check)
 async function cmdController(message) {
-    let args = message.content.substr(Config.cmdPrefix.length);
-    args = args.split(" ");
+    let splitMe = message.content.substr(Config.cmdPrefix.length);
+
+    /* Regular expression credit: https://stackoverflow.com/a/18647776/5216257 */
+    //The parenthesis in the regex creates a captured group within the quotes
+    var regex = /[^\s"]+|"([^"]*)"/gi;
+    var args = [];
+    do {
+        //Each call to exec returns the next regex match as an array
+        var match = regex.exec(splitMe);
+        if (match != null) {
+            //Index 1 in the array is the captured group if it exists
+            //Index 0 is the matched text, which we use if no captured group exists
+            args.push(match[1] ? match[1] : match[0]);
+        }
+    } while (match != null);
 
     let cmd = args.shift().toLowerCase();
     if (existsInRunnable(cmd)) {
@@ -100,5 +140,14 @@ async function cmdController(message) {
     }
 }
 
+let terminationScripts = [];
+
+async function terminate() {
+    log(`Running termination scripts and exiting`);
+    for (let script in terminationScripts) {
+        await terminationScripts[script](); // TODO: Timeout on termination scripts to prevent hanging?
+    }
+    process.exit(0);
+}
 
 Client.login(Config.botToken);

@@ -1,11 +1,11 @@
 const h = require("../helper.js");
 
-module.exports.myid = function cmdMyID(message, args) {
+module.exports.myid = function (message, args) {
     h.sendMessage(message.author, message.author, `Your Discord ID is: ${h.verboseUserTag(message.author)}`);
     return true;
 };
 
-module.exports.avatar = function cmdAvatar(message, args) {
+module.exports.avatar = function (message, args) {
     let user;
     if (args.length > 1) {
         return;
@@ -20,7 +20,7 @@ module.exports.avatar = function cmdAvatar(message, args) {
     return true;
 };
 
-module.exports.ping = function cmdPing(message, args) {
+module.exports.ping = function (message, args) {
     if (args.length !== 0) return;
     h.sendMessage(message.author, message.author, `Pong!`);
     return true;

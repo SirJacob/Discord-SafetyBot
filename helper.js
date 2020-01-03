@@ -1,4 +1,5 @@
 const pb = require("./PoliceBot.js");
+const callsites = require('callsites');
 
 /*
  * Resolves a user's (String) ID or mention ID to a Discord.JS User or GuildMember.
@@ -7,7 +8,7 @@ const pb = require("./PoliceBot.js");
  * @returns {User or GuildMember} - A Discord.JS User is return if no guild is supplied. Otherwise, a GuildMember is
  * returned.
  */
-module.exports.getUser = function getUser(id, guild) {
+module.exports.getUser = function (id, guild) {
     if (id.indexOf("<@") === 0 && id.charAt(id.length - 1) === '>') { //TODO: id.indexOf("<@") === 0 ==> Discord.MessageMentions.USERS_PATTERN (RegExp)
         id = id.includes('!') ? id.substring(3, id.length - 1) : id.substring(2, id.length - 1);
     }
@@ -19,11 +20,11 @@ module.exports.getUser = function getUser(id, guild) {
     });
 };
 
-module.exports.userToMention = function userToMention(user){
+module.exports.userToMention = function (user) {
     return `<@!${user.id}>`
 };
 
-module.exports.getRole = function getRole(guild, id) {
+module.exports.getRole = function (guild, id) {
     return guild.roles.find(function (role) {
         if (role.id.search(id) > -1) {
             return role;
@@ -31,7 +32,7 @@ module.exports.getRole = function getRole(guild, id) {
     });
 };
 
-module.exports.isAdmin = function isAdmin(member) {
+module.exports.isAdmin = function (member) {
     return member.permissions.has("ADMINISTRATOR");
 };
 
@@ -43,7 +44,7 @@ module.exports.isAdmin = function isAdmin(member) {
 * @param {String} message - Message to be sent.
 * @returns {Boolean} - If the message was successfully sent.
  */
-module.exports.sendMessage = async function sendMessage(sender, receiver, message) {
+module.exports.sendMessage = async function (sender, receiver, message) {
     if (message.length > 2000) {
         await sender.send("You attempted to run a command that had an output that exceeded the character limit allowed by Discord; no message was sent.");
         return false;
@@ -53,18 +54,38 @@ module.exports.sendMessage = async function sendMessage(sender, receiver, messag
     }
 };
 
-module.exports.verboseUserTag = function verboseUserTag(user) {
+module.exports.verboseUserTag = function (user) {
     return `${user.tag} (${user.id})`
 };
 
-module.exports.verboseChannelTag = function verboseChannelTag(channel) {
+module.exports.verboseChannelTag = function (channel) {
     return `${channel.guild.name}#${channel.name} (${channel.guild.id}#${channel.id})`
 };
 
-module.exports.verboseGuildTag = function verboseGuildTag(guild) {
+module.exports.verboseGuildTag = function (guild) {
     return `${guild.name} (${guild.id})`
 };
 
-module.exports.log = function log(message) {
-    console.log(`Discord-PoliceBot: ${message}`);
+module.exports.log = function (message) {
+    let filename = callsites()[1].getFileName();
+    let funcName;
+    if (filename.includes(`\\scripts\\`)) {
+        filename = filename.substr(filename.lastIndexOf(`\\scripts\\`));
+        funcName = `#${callsites()[1].getFunctionName()}()`;
+    } else {
+        filename = filename.substr(filename.lastIndexOf(`\\`));
+        funcName = ``; // TODO: funcName
+    }
+    console.log(`${filename.substr(1)}${funcName}: ${message}`);
+};
+
+/*
+* Credit: https://stackoverflow.com/a/15453499/5216257
+ */
+module.exports.range = function (start, stop, step = 1) {
+    let a = [start], b = start;
+    while (b < stop) {
+        a.push(b += step || 1);
+    }
+    return a;
 };

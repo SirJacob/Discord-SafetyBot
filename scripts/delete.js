@@ -2,7 +2,7 @@ const h = require("../helper.js");
 
 /* ==> WARNING: UNTESTED <== */
 
-module.exports.delete = async function cmdDelete(message, args) {
+module.exports.delete = async function (message, args) {
     // TODO: Convert delete functions to reusable code
     let fetchLimit = 50 + 1; // TODO: Figure out Discord's limit and pick a limit
     if (args.length === 1 && !isNaN(args[0])) {
