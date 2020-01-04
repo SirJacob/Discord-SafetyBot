@@ -89,3 +89,14 @@ module.exports.range = function (start, stop, step = 1) {
     }
     return a;
 };
+
+module.exports.updateMessage = function (newText, channel, lastMessage = undefined) {
+    if (lastMessage === undefined) {
+        channel.send(newText).then(function (message) {
+            lastMessage = message;
+        });
+    } else {
+        lastMessage.edit(newText);
+    }
+    return lastMessage;
+};

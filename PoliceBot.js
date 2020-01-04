@@ -5,12 +5,14 @@ const Config = require("./config.json");
 const h = require("./helper.js");
 const fs = require("fs");
 const path = require("path");
+const pbEvents = new (require('events').EventEmitter);
 const Client = new Discord.Client({
     "apiRequestMethod": "burst" // sequential or burst
 });
 /* Exports that scripts can use */
 module.exports.Client = Client;
 module.exports.terminate = terminate;
+module.exports.events = pbEvents;
 
 /* Removed disabledEvents from ClientOptions and stopped removing all disabledEvents listeners because of role giving/
 * taking was leading to timeouts. May reimplement/reinvestigate if memory issues are found again. */
@@ -92,6 +94,8 @@ Client.on("message", async message => {
         await cmdController(message);
         //Keep the CMDs out of chat
         message.delete();
+    } else {
+        pbEvents.emit("message", message);
     }
 });
 
@@ -143,7 +147,7 @@ async function cmdController(message) {
 let terminationScripts = [];
 
 async function terminate() {
-    log(`Running termination scripts and exiting`);
+    h.log(`Running termination scripts and exiting`);
     for (let script in terminationScripts) {
         await terminationScripts[script](); // TODO: Timeout on termination scripts to prevent hanging?
     }

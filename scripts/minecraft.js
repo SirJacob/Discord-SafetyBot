@@ -13,7 +13,7 @@ let timer;
 module.exports.mcstatus = async function (message, args) {
     if (!h.range(1, 2).includes(args.length)) return;
 
-    if(lastMessage !== undefined) module.exports.terminate();
+    if (lastMessage !== undefined) module.exports.terminate();
 
     channel = message.channel;
     serverIP = args[0];
@@ -36,25 +36,15 @@ function updateStatus() {
     request(url, function (error, response, body) {
         let server = JSON.parse(body);
         if (server["online"]) {
-            updateMessage(`
+            lastMessage = h.updateMessage(`
             ${server["motd"]["clean"][0]}
             IP: ${serverIP}
             The server is UP with ${server["players"]["online"]}/${server["players"]["max"]} players online
             (data refreshes every 2 mins)
 
-${appendText}`);
+${appendText}`, channel, lastMessage);
         } else {
-            updateMessage(`The server is DOWN! :(`);
+            lastMessage = h.updateMessage(`The server is DOWN! :(`, channel, lastMessage);
         }
     });
-}
-
-function updateMessage(text) {
-    if (lastMessage === undefined) {
-        channel.send(text).then(function (message) {
-            lastMessage = message;
-        });
-    } else {
-        lastMessage.edit(text);
-    }
 }
