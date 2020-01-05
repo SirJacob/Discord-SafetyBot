@@ -29,12 +29,12 @@ module.exports.cleverbot = function (message, args) {
             `Your cleverbot state is: ${cleverbotState} You can use ${Config.cmdPrefix}cleverbot state "${cleverbotState}" to continue this chat session later.`);
     } else if (cmd === "state" && args.length === 2) {
         if (channel === undefined) {
-            h.sendMessage(message.author,message.author,`You must use '${Config.cmdPrefix}cleverbot start' first!`);
+            h.sendMessage(message.author, message.author, `You must use '${Config.cmdPrefix}cleverbot start' first!`);
             return;
         }
         h.sendMessage(message.author, message.channel,
             `<@!${message.author.id}> changed Cleverbot's context state${(cleverbotState === undefined) ? ''
-                : ` from ${cleverbotState}`} to '${args[1]}'`);
+                : ` from ${cleverbotState}`} to ${args[1]}`);
         cleverbotState = args[1];
     } else if (cmd === "new" && args.length === 1) {
         cleverbotState = undefined;
@@ -77,11 +77,34 @@ function askCleverbot(message) {
                 break;
         }
         if (response.statusCode !== 200) {
-            h.log(`Request Error: ${apiError}`);
+            h.log(`Cleverbot API Request Error: ${apiError}`);
             return;
         }
-        output = JSON.parse(body);
+        let output = JSON.parse(body);
         if (cleverbotState === undefined) cleverbotState = output["cs"];
-        h.sendMessage(message.author, message.channel, `Cleverbot: ${output["output"]}`);
+        let cleverbotResponse = output["output"];
+
+        if (cleverbotResponse.endsWith('.')) {
+            cleverbotResponse = cleverbotResponse.substring(0, cleverbotResponse.length - 1);
+        }
+
+        /* Google Translate */
+        url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(cleverbotResponse)}`;
+        request(url, function (error, response, body) {
+            if (response.statusCode !== 200) {
+                h.log(`Google Translate API Request Error`);
+                return;
+            }
+            let output = JSON.parse(body);
+            let lang = output[2];
+            let translatedResponse = output[0][0][0];
+
+            if (lang === "en") {
+                output = cleverbotResponse;
+            } else {
+                output = `${translatedResponse} (${lang}: ${cleverbotResponse})`;
+            }
+            h.sendMessage(message.author, message.channel, output);
+        });
     });
 }
