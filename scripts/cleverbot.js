@@ -1,3 +1,5 @@
+// TODO: Cleverbot state per guild
+
 const pb = require("../PoliceBot.js");
 const h = require("../helper.js");
 const Config = require("../config.json"); // Add to the config: "cleverbotToken": "YOUR_TOKEN"
@@ -8,7 +10,6 @@ let cleverbotState; // a.k.a cs
 
 module.exports.initialize = function () {
     pb.events.on("message", async message => {
-        if (message.author === pb.Client.user) return;
         if (channel !== message.channel) return;
         askCleverbot(message);
     });
@@ -25,7 +26,7 @@ module.exports.cleverbot = function (message, args) {
     } else if (cmd === "getcs" && args.length === 1) {
         h.sendMessage(message.author, message.author, (cleverbotState === undefined) ?
             `No cleverbot state exists. A new chat instance will be started on your next chat.` :
-            `Your cleverbot state is: ${cleverbotState} You can use ${Config.cmdPrefix}state ${cleverbotState} to continue this chat session later.`);
+            `Your cleverbot state is: ${cleverbotState} You can use ${Config.cmdPrefix}cleverbot state "${cleverbotState}" to continue this chat session later.`);
     } else if (cmd === "state" && args.length === 2) {
         if (channel === undefined) {
             h.sendMessage(message.author,message.author,`You must use '${Config.cmdPrefix}cleverbot start' first!`);
@@ -37,11 +38,20 @@ module.exports.cleverbot = function (message, args) {
         cleverbotState = args[1];
     } else if (cmd === "new" && args.length === 1) {
         cleverbotState = undefined;
+    } else if (cmd === "help" && args.length === 1) {
+        h.sendMessage(message.author, message.author, `Cleverbot Commands:
+${Config.cmdPrefix}cleverbot start -> Start talking to Cleverbot in this channel.
+${Config.cmdPrefix}cleverbot stop -> Stop talking to Cleverbot in this channel.
+${Config.cmdPrefix}cleverbot new -> Start a new conversation with Cleverbot.
+${Config.cmdPrefix}cleverbot getcs -> Get Cleverbot's state. This can be used to go back to a previous conversation.
+${Config.cmdPrefix}cleverbot state "CLEVERBOT_STATE_HERE" -> Supply a Cleverbot state and return to a previous conversation.
+
+Note: Right now, Cleverbot can only talk in one channel at a time.`);
     }
+    return true;
 };
 
 function askCleverbot(message) {
-    console.log(cleverbotState);
     let url = `https://www.cleverbot.com/getreply?key=${Config.cleverbotToken}&input=${encodeURI(message.content)}
     ${(cleverbotState === undefined) ? `` : `&cs=${cleverbotState}`}`;
 
@@ -73,6 +83,5 @@ function askCleverbot(message) {
         output = JSON.parse(body);
         if (cleverbotState === undefined) cleverbotState = output["cs"];
         h.sendMessage(message.author, message.channel, `Cleverbot: ${output["output"]}`);
-        console.log(cleverbotState);
     });
 }

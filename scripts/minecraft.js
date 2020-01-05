@@ -1,3 +1,4 @@
+/* https://api.mcsrvstat.us/ */
 const h = require("../helper.js");
 let request = require("request"); // devDependencies
 
