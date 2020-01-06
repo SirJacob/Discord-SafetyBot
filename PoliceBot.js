@@ -20,7 +20,7 @@ Client.on('newListener', (event, listener) => {
 });
 
 Client.on('rateLimit', rateLimitInfo => {
-    h.log("==> RATE LIMITED <==");
+    h.log("Discord API rate limit warning!");
 });
 
 let botReady = false;
@@ -122,8 +122,8 @@ async function cmdController(message) {
 
     /* Regular expression credit: https://stackoverflow.com/a/18647776/5216257 */
     //The parenthesis in the regex creates a captured group within the quotes
-    var regex = /[^\s"]+|"([^"]*)"/gi;
-    var args = [];
+    let regex = /[^\s"]+|"([^"]*)"/gi;
+    let args = [];
     do {
         //Each call to exec returns the next regex match as an array
         var match = regex.exec(splitMe);

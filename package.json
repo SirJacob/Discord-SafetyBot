@@ -1,18 +1,19 @@
 {
   "name": "@sirjacob/discord-policebot",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Discord bot that allows you to import a run your own scripts!",
   "main": "PoliceBot.js",
   "keywords": [],
   "author": "Sir Jacob",
   "dependencies": {
+    "callsites": "latest",
     "discord.js": "^11.5.1",
-    "npm": "^6.13.4",
-    "callsites": "latest"
+    "npm": "^6.13.4"
   },
   "devDependencies": {
     "mongodb": "^3.4.1",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "@google-cloud/translate": "^5.1.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
