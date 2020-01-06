@@ -28,10 +28,10 @@ let botReady = false;
 //This event will run if the bot starts, and logs in, successfully.
 Client.on("ready", async () => {
     Client.user.setActivity(Config.defaultActivity);
-    h.log(`${h.verboseUserTag(Client.user)} started already connected to ${Client.guilds.size} Discord server(s). Serving ${Client.users.size - 1} unique user(s) in ${Client.channels.size} channel(s).`);
+    h.log(`${h.verboseUserTag(Client.user)} online. Connected to ${Client.guilds.size} Discord server(s) serving ${Client.users.size} unique user(s) in ${Client.channels.size} channel(s).`);
     for (let key of Client.guilds) {
         let guild = Client.guilds.get(key[0]);
-        h.log(`Preexisting server detected: ${h.verboseGuildTag(guild)} | Users: ${guild.memberCount - 1} | Channels: ${guild.channels.size}`);
+        h.log(`Reconnected to ${h.verboseGuildTag(guild)} | Users: ${guild.memberCount} | Channels: ${guild.channels.size}`);
     }
 
     // Create a scripts folder
@@ -148,6 +148,7 @@ let terminationScripts = [];
 
 async function terminate() {
     h.log(`Running termination scripts and exiting`);
+    botReady = false;
     for (let script in terminationScripts) {
         await terminationScripts[script](); // TODO: Timeout on termination scripts to prevent hanging?
     }

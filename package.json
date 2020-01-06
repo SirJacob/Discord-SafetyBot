@@ -1,6 +1,10 @@
 {
-  "name": "discord-policebot",
-  "version": "0.0.7",
+  "name": "@sirjacob/discord-policebot",
+  "version": "0.0.8",
+  "description": "A Discord bot that allows you to import a run your own scripts!",
+  "main": "PoliceBot.js",
+  "keywords": [],
+  "author": "Sir Jacob",
   "dependencies": {
     "discord.js": "^11.5.1",
     "npm": "^6.13.4",
@@ -9,5 +13,17 @@
   "devDependencies": {
     "mongodb": "^3.4.1",
     "request": "^2.88.0"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SirJacob/Discord-PoliceBot.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/SirJacob/Discord-PoliceBot/issues"
+  },
+  "homepage": "https://github.com/SirJacob/Discord-PoliceBot#readme"
 }
