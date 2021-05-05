@@ -1,5 +1,10 @@
-const pb = require("./PoliceBot.js");
-const callsites = require('callsites');
+/* TODO: All functions have not been tested with the latest release of Discord.js,
+    some functions may no longer work or may not work as intended. */
+
+const sb = require("./SafetyBot.js");
+const fs = require('fs')
+const l = require("./Logger");
+const Config = require("./config.json");
 
 /*
  * Resolves a user's (String) ID or mention ID to a Discord.JS User or GuildMember.
@@ -12,7 +17,7 @@ module.exports.getUser = function (id, guild) {
     if (id.indexOf("<@") === 0 && id.charAt(id.length - 1) === '>') { //TODO: id.indexOf("<@") === 0 ==> Discord.MessageMentions.USERS_PATTERN (RegExp)
         id = id.includes('!') ? id.substring(3, id.length - 1) : id.substring(2, id.length - 1);
     }
-    let collection = guild == null ? pb.Client.users : guild.members;
+    let collection = guild == null ? sb.Client.users.cache : guild.members.cache;
     return collection.find(function (user) {
         if (user.id.search(id) > -1) {
             return user;
@@ -32,8 +37,9 @@ module.exports.getRole = function (guild, id) {
     });
 };
 
-module.exports.isAdmin = function (member) {
-    return member.permissions.has("ADMINISTRATOR");
+module.exports.isAdmin = function (guildMember) {
+    return guildMember.hasPermission(`ADMINISTRATOR`);
+    //return member.permissions.has("ADMINISTRATOR");
 };
 
 /*
@@ -54,6 +60,10 @@ module.exports.sendMessage = async function (sender, receiver, message) {
     }
 };
 
+module.exports.sendEmbed = async function (receiver, embed) {
+    await receiver.send({embed: embed});
+}
+
 module.exports.verboseUserTag = function (user) {
     return `${user.tag} (${user.id})`
 };
@@ -64,19 +74,6 @@ module.exports.verboseChannelTag = function (channel) {
 
 module.exports.verboseGuildTag = function (guild) {
     return `${guild.name} (${guild.id})`
-};
-
-module.exports.log = function (message) {
-    let filename = callsites()[1].getFileName();
-    let funcName;
-    if (filename.includes(`\\scripts\\`)) {
-        filename = filename.substr(filename.lastIndexOf(`\\scripts\\`));
-        funcName = `#${callsites()[1].getFunctionName()}()`;
-    } else {
-        filename = filename.substr(filename.lastIndexOf(`\\`));
-        funcName = ``; // TODO: funcName
-    }
-    console.log(`${filename.substr(1)}${funcName}: ${message}`);
 };
 
 /*
@@ -90,7 +87,7 @@ module.exports.range = function (start, stop, step = 1) {
     return a;
 };
 
-module.exports.updateMessage = function (newText, channel, lastMessage = undefined) {
+module.exports.updateMessage = function updateMessage(newText, channel, lastMessage = undefined) {
     if (lastMessage === undefined) {
         channel.send(newText).then(function (message) {
             lastMessage = message;
@@ -100,3 +97,73 @@ module.exports.updateMessage = function (newText, channel, lastMessage = undefin
     }
     return lastMessage;
 };
+
+module.exports.isUndefined = function isUndefined(obj) {
+    return obj === undefined;
+}
+
+module.exports.readFile = async function readFile(path) {
+    return new Promise((resolve => {
+        fs.readFile(path, 'utf8', function (err, data) {
+            if (err) {
+                l.pFormatLog({
+                    message: err,
+                    level: `ERROR`,
+                    tag: `FILE`
+                });
+            } else {
+                l.pFormatLog({
+                    message: `Read: '${path}'`,
+                    level: `VERBOSE`,
+                    tag: `FILE`
+                });
+            }
+            resolve(data);
+        });
+    }));
+}
+
+module.exports.updateConfig = function (k, v) {
+    if (Config[k] !== v) {
+        Config[k] = v;
+        fs.writeFileSync(`./config.json`, JSON.stringify(Config, null, 4));
+        l.pFormatLog({
+            message: `./config.json:${k} has been updated`,
+            level: `VERBOSE`,
+            tag: `FILE`
+        });
+        sb.events.emit("CONFIG_UPDATE", k);
+    }
+}
+
+/* Credit: https://medium.com/irrelevant-code/javascript-deep-cloning-and-value-vs-reference-5bf09bf980d6 */
+module.exports.deepCopy = function (object) {
+    let output = Array.isArray(object) ? [] : {};
+    for (let data in object) {
+        let value = object[data]
+        output[data] = (typeof value === "object") ? module.exports.deepCopy(value) : value;
+    }
+    return output;
+}
+
+module.exports.findOrCreateChannel = async function (guild, channelName, options) {
+    guild.fetch();
+    let returnChannel;
+    guild.channels.cache.forEach((channel) => {
+        //console.log(`${guild.channels.cache.get(guildID).name.toLowerCase()} vs ${channelName.toLowerCase()}`);
+        if (channel.name.toLowerCase() === channelName.toLowerCase()) {
+            returnChannel = channel;
+        }
+    });
+
+    if (returnChannel === undefined) {
+        l.formatLog(
+            `The requested channel, ${channelName}, couldn't be found, so it is being created...`,
+            `VERBOSE`,
+            `API`
+        );
+        return await guild.channels.create(channelName, options);
+    } else {
+        return returnChannel;
+    }
+}

@@ -1,30 +1,30 @@
 {
-  "name": "@sirjacob/discord-policebot",
-  "version": "0.0.9",
-  "description": "A Discord bot that allows you to import a run your own scripts!",
-  "main": "PoliceBot.js",
+  "name": "@sirjacob/discord-safetybot",
+  "version": "0.1.0",
+  "description": "A scriptable Discord bot that comes with scripts to automatically limit membership to those with shared email domains and to scan chat using an NLP API for offensive content.",
+  "main": "SafetyBot.js",
   "keywords": [],
   "author": "Sir Jacob",
   "dependencies": {
-    "callsites": "latest",
-    "discord.js": "^11.5.1",
-    "npm": "^6.13.4"
+    "@sendgrid/mail": "7.4.2",
+    "callsites": "3.1.0",
+    "discord.js": "12.5.1",
+    "mysql": "^2.18.1",
+    "request": "^2.88.0",
+    "npm": "latest"
   },
   "devDependencies": {
-    "mongodb": "^3.4.1",
-    "request": "^2.88.0",
-    "@google-cloud/translate": "^5.1.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SirJacob/Discord-PoliceBot.git"
+    "url": "git+https://github.com/SirJacob/Discord-SafetyBot.git"
   },
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/SirJacob/Discord-PoliceBot/issues"
+    "url": "https://github.com/SirJacob/Discord-SafetyBot/issues"
   },
-  "homepage": "https://github.com/SirJacob/Discord-PoliceBot#readme"
+  "homepage": "https://github.com/SirJacob/Discord-SafetyBot#readme"
 }

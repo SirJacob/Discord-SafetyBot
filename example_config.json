@@ -1,0 +1,15 @@
+{
+    "botToken": "Discord Bot Token",
+    "cmdPrefix": "!sb ",
+    "defaultActivity": "SafeJoin",
+    "SENDGRID_API_KEY": "Required to send verification emails",
+    "mysqlHost": "127.0.0.1",
+    "mysqlUser": "root",
+    "mysqlPassword": "password",
+    "mysqlDatabase": "SafeJoin",
+    "SafeJoin_GuildID": "Delete this text, while leaving the quotes.",
+    "SafeJoin_Domain": "@gmail.com",
+    "SafeJoin_extWebservAddr": "localhost:5000",
+    "SafeJoin_WebservPort": 5000,
+    "_comment": "After modifying this example config, rename it to config.json"
+}
