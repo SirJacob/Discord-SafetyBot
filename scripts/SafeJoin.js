@@ -44,8 +44,8 @@ sb.Client.on("guildMemberAdd", guildMember => {
 module.exports.cmd_verify = {
     func: function (message, args) {
         args[0] = args[0].toLowerCase().trim();
-        if (args[0].endsWith(Config.SafeJoin_extWebservAddr)) {
-            let emailID = args[0].substring(0, args[0].indexOf(Config.SafeJoin_extWebservAddr));
+        if (args[0].endsWith(Config.SafeJoin_Domain)) {
+            let emailID = args[0].substring(0, args[0].indexOf(Config.SafeJoin_Domain));
             let verifyKey = genVerifyKey(16);
             if (module.exports.verifyCache === undefined) {
                 module.exports.verifyCache = {};
@@ -61,7 +61,7 @@ module.exports.cmd_verify = {
                 from: 'SafeJoin@coryug.one',
                 template_id: 'd-21bb0ae55ddb4b9cbedc9422239ebe81',
                 dynamic_template_data: {
-                    "verify-link": `${Config.Config.SafeJoin_extWebservAddr}/MU/SafeJoin?verify=${verifyKey}`
+                    "verify-link": `${Config.SafeJoin_extWebservAddr}/MU/SafeJoin?verify=${verifyKey}`
                 }
             });
 
@@ -69,7 +69,7 @@ module.exports.cmd_verify = {
             h.sendEmbed(message.member, {
                 title: `Marymount University Discord SafeJoin`,
                 color: 0x275075, // Marymount Blue
-                description: `Please check your ${Config.SafeJoin_extWebservAddr.substring(1)} email to continue the verification process!`
+                description: `Please check your ${Config.SafeJoin_Domain.substring(1)} email to continue the verification process!`
             });
         } else {
             let targetGuildMember = h.getUser(args[0], message.guild);
